@@ -60,9 +60,9 @@ boolean CPlugin_006(byte function, struct EventStruct *event, String& string)
         TempEvent.Par1 = topicSplit[6].toInt();
         TempEvent.Par2 = 0;
         TempEvent.Par3 = 0;
-        if (event->String2 == "false" || event->String2 == "true")
+        if (event->String2 == F("false") || event->String2 == F("true"))
         {
-          if (event->String2 == "true")
+          if (event->String2 == F("true"))
             TempEvent.Par2 = 1;
         }
         else
@@ -76,9 +76,13 @@ boolean CPlugin_006(byte function, struct EventStruct *event, String& string)
 
     case CPLUGIN_PROTOCOL_SEND:
       {
+        if (WiFi.status() != WL_CONNECTED) {
+          success = false;
+          break;
+        }
         ControllerSettingsStruct ControllerSettings;
         LoadControllerSettings(event->ControllerIndex, (byte*)&ControllerSettings, sizeof(ControllerSettings));
-        
+
         statusLED(true);
 
         if (ExtraTaskSettings.TaskDeviceValueNames[0][0] == 0)
@@ -90,7 +94,7 @@ boolean CPlugin_006(byte function, struct EventStruct *event, String& string)
         pubname.replace(F("%id%"), String(event->idx));
 
         String value = "";
-        byte DeviceIndex = getDeviceIndex(Settings.TaskDeviceNumber[event->TaskIndex]);
+        // byte DeviceIndex = getDeviceIndex(Settings.TaskDeviceNumber[event->TaskIndex]);
         byte valueCount = getValueCountFromSensorType(event->sensorType);
         for (byte x = 0; x < valueCount; x++)
         {
@@ -99,11 +103,11 @@ boolean CPlugin_006(byte function, struct EventStruct *event, String& string)
           if (event->sensorType == SENSOR_TYPE_LONG)
             value = (unsigned long)UserVar[event->BaseVarIndex] + ((unsigned long)UserVar[event->BaseVarIndex + 1] << 16);
           else
-            value = toString(UserVar[event->BaseVarIndex + x], ExtraTaskSettings.TaskDeviceValueDecimals[x]);
+            value = formatUserVar(event, x);
           MQTTclient.publish(tmppubname.c_str(), value.c_str(), Settings.MQTTRetainFlag);
         }
         break;
       }
-      return success;
   }
+  return success;
 }

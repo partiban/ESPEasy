@@ -4,10 +4,12 @@
 
 #define PLUGIN_006
 #define PLUGIN_ID_006        6
-#define PLUGIN_NAME_006       "Temperature & Pressure - BMP085"
+#define PLUGIN_NAME_006       "Environment - BMP085/180"
 #define PLUGIN_VALUENAME1_006 "Temperature"
 #define PLUGIN_VALUENAME2_006 "Pressure"
 
+
+// TODO this will not work if we have more than one of this task!
 boolean Plugin_006_init = false;
 
 boolean Plugin_006(byte function, struct EventStruct *event, String& string)
@@ -47,18 +49,14 @@ boolean Plugin_006(byte function, struct EventStruct *event, String& string)
 
     case PLUGIN_WEBFORM_LOAD:
       {
-        string += F("<TR><TD>Altitude [m]:<TD><input type='text' title='Set Altitude to 0 to get measurement without altitude adjustment' name='");
-        string += F("_p006_bmp085_elev' value='");
-        string += Settings.TaskDevicePluginConfig[event->TaskIndex][1];
-        string += F("'>");
+      	addFormNumericBox(string, F("Altitude [m]"), F("_p006_bmp085_elev"), Settings.TaskDevicePluginConfig[event->TaskIndex][1]);
         success = true;
         break;
       }
 
     case PLUGIN_WEBFORM_SAVE:
       {
-        String elev = WebServer.arg(F("_p006_bmp085_elev"));
-        Settings.TaskDevicePluginConfig[event->TaskIndex][1] = elev.toInt();
+        Settings.TaskDevicePluginConfig[event->TaskIndex][1] = getFormItemInt(F("_p006_bmp085_elev"));
         success = true;
         break;
       }
@@ -100,7 +98,7 @@ boolean Plugin_006(byte function, struct EventStruct *event, String& string)
 #define BMP085_ULTRAHIGHRES         3
 #define BMP085_CAL_AC1           0xAA  // R   Calibration data (16 bits)
 #define BMP085_CAL_AC2           0xAC  // R   Calibration data (16 bits)
-#define BMP085_CAL_AC3           0xAE  // R   Calibration data (16 bits)    
+#define BMP085_CAL_AC3           0xAE  // R   Calibration data (16 bits)
 #define BMP085_CAL_AC4           0xB0  // R   Calibration data (16 bits)
 #define BMP085_CAL_AC5           0xB2  // R   Calibration data (16 bits)
 #define BMP085_CAL_AC6           0xB4  // R   Calibration data (16 bits)
@@ -139,6 +137,8 @@ boolean Plugin_006_bmp085_begin()
   mb = Plugin_006_bmp085_read16(BMP085_CAL_MB);
   mc = Plugin_006_bmp085_read16(BMP085_CAL_MC);
   md = Plugin_006_bmp085_read16(BMP085_CAL_MD);
+
+  return(true);
 }
 
 /*********************************************************************/

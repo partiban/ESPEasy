@@ -1,3 +1,784 @@
+-------------------------------------------------
+Changes in release mega-20180113 (since mega-20180112)
+-------------------------------------------------
+
+Release date: Sat Jan 13 05:00:10 CET 2018
+
+Edwin Eefting (2):
+      ESPEasy v2.0 only supports compiling under arduino core 2.3.0 to prevent issues like #705 when people use Arduino IDE to compile with arduino core 2.4.0
+      fix version number
+
+
+-------------------------------------------------
+Changes in release mega-20180112 (since mega-20180111)
+-------------------------------------------------
+
+Release date: Fri Jan 12 02:05:49 CET 2018
+
+ESPEasy release bot (1):
+      automaticly updated release notes for v2.0-20180111
+
+Edwin Eefting (8):
+      added http server emulation and domotics http to testsuite
+      first http domoticz test works
+      testsuite requirements
+      fixed releasebot issues with multiple branches
+      automaticly updated release notes for v2.0-20180112
+      release bot fixes
+      dont make same release twice
+      dont make same release twice
+
+Gijs Noorlander (2):
+      [Issue 699] Incorrect shown device name (#700)
+      [v2.0 #470] Do not send invalid values to a controller (#701)
+
+
+-------------------------------------------------
+Changes in release mega-20180111 (since v2.0-20180110)
+-------------------------------------------------
+
+Release date: Thu Jan 11 05:00:08 CET 2018
+
+Alexander Schulz (1):
+      improvement: Configurable number of tasks for "Devices" page (TASKS_P…
+
+BadWolf42 (1):
+      Dallas Plugin enhanced : no more "delay()" (#488)
+
+Bartłomiej Zimoń (1):
+      Update _C002.ino (#645)
+
+DaM (1):
+      [Domoticz HTTP] Compatibility fix for BMP280 (#636)
+
+ESPEasy release bot (5):
+      created releasebot script
+      automaticly updated release notes for mega-01022018
+      automaticly updated release notes for mega-01032018
+      changed date format of nightly builds
+      automaticly updated release notes for mega-20180104
+
+Edwin Eefting (22):
+      keep TASKS_PER_PAGE at default value of 4
+      fix plugin id (starting with a 0 makes it octal in c++ :( )
+      fix warnings
+      fixed bug in oled upstream lib
+      test fixes
+      smooth out testing code
+      esptest stuff
+      fix travis build errors. disable cpp checking for now
+      set lcd to NULL by default. #584
+      fix illegal string manipulations in PLUGIN_WRITE for some plugins. fixes #347 and #460
+      fix #588. parseTemplate() now only checks enabled taskes for [] macros
+      testing for ds18b20
+      updated travis link to reflect v2.0
+      changed readme to reflect mega branch and automated builds
+      updates version numbering documentation
+      changed devicecombobox handling to save a lot of memory on device page. fixes #654 #676 and could be triggered by #683 in some cases.
+      oops...somehow git did made some changes :(
+      copied test-stuff from mega to v2.0 to do some testing
+      analysed some code and added comments
+      test suite fixes
+      added frame oled test
+      working on http mocker for test suite
+
+GHolli (1):
+      Cosmetics: fixing typos. (#628)
+
+Gijs Noorlander (14):
+      P028 to support both BME280 and BMP280 to reduce resource usage (#481)
+      Single function for format to user defined number decimals (#482)
+      OLED framed improve header footer (#495)
+      [SSD1306] Feature/oled 1306 library upgrade (#501)
+      [MH-Z19] Allow for B-version and add filtering (#525)
+      Support both SSD1306 and SH1106 OLED in OLED_Framed plugin (#509)
+      [LCD plugin] Added check of LCD object before dereferencing it (#584)
+      [P039 Thermocouple] Handling negative values and proper error logging (#586)
+      Reduce iRAM usage for plugins using SoftwareSerial (#631)
+      [Security] Add IP-based filtering to web interface and http-commands. (#653)
+      [SDS011] Allow the sensor to sleep to extend sensor lifetime (#668)
+      [CPPcheck] v2.0 ControllerSettingsStruct some variables not initialized (#692)
+      Merge/v2.0 dev13 to mega (#695)
+      [v2.0_kamstrup] Plugin configuration does not load (#697)
+
+Grovkillen (6):
+      Added categories... (#552)
+      Changed bin file names to be more descriptive. (#597)
+      Move "TTP229 keypad" and "Encoder" plugin from "testing" to "normal"  (#619)
+      Updated ESPTOOLS.exe from 0.4.6 to 0.4.12 (#627)
+      Updated "/pinstates" page: Made the plugin number column display "P001" instead of "1" and "P012" instead of "12".
+      Update README.md
+
+M0ebiu5 (1):
+      P022_PCA9685 added change frequency - P038_NeoPixel added RGBW strips (SK6812) (#638)
+
+Michael (2):
+      WebServer.ino: enhance handle_SDfilelist() (#507)
+      src/Hardware.ino: make it possible to use GPIO-0 (D3) as Pin_sd_cs (#508)
+
+Sen Haerens (1):
+      Enhanced system info layout (#624)
+
+SightofSilence (1):
+      Add System Variable for day, month and year / Fix for "Calculate" function to recognize minus-sign (#485)
+
+SloMusti (1):
+      implemewnted web activity timer tracker (#462)
+
+Tomasz Torcz (1):
+      retain MQTT LWT messages (#516)
+
+denisfrench (1):
+      Set MQTT clientid to %sysname% +/- Settings.Unit (#431) (#436)
+
+fensoft (1):
+      added #define FEATURE_SD (permit a flash size reduction of ~10k) (#568)
+
+hatzlhoffer (1):
+      added new display size 128x32 (#545)
+
+krikk (1):
+      added support for the TSL2591 Sensor based on Adafruit Library (#661)
+
+mvdbro (8):
+      First preparations for ESP32
+      ESP32 IRAM/Deepsleep
+      ESP32 Rules/ADC/PWM
+      ESP32 fix FreeRAM reporting
+      ESP32 Enabled OTA
+      ESP32 fix UDP instability
+      ESP32 fixed chunked HTTP transfer
+      Fix #599
+
+papperone (3):
+      Plugin 073 - 7-segment display plugin TM1637/MAX7219
+      Update _P073_7DGT.ino (#553)
+      deleted GPIO notes referring to 75HC595 not supported (#591)
+
+paulv888 (1):
+      usesID = true (#666)
+
+s0170071 (2):
+      split IP addrress (#605)
+      fix chunking (#649)
+
+sakinit (1):
+      Fix p1 wifi gateway module (#587)
+
+
+-------------------------------------------------
+Changes in release mega-20180104 (since mega-01032018)
+-------------------------------------------------
+
+Release date: Thu Jan  4 03:13:01 UTC 2018
+
+ESPEasy release bot (1):
+      changed date format of nightly builds
+
+
+-------------------------------------------------
+Changes in release mega-01032018 (since mega-01022018)
+-------------------------------------------------
+
+Release date: Wed Jan  3 04:00:06 UTC 2018
+
+Edwin Eefting (4):
+      updated readme to reflect new binary names
+      updated travis link to reflect v2.0
+      updated travis link to reflect v2.0
+      changed readme to reflect mega branch and automated builds
+
+
+-------------------------------------------------
+Changes in release mega-01022018 (since v2.0.0-dev13)
+-------------------------------------------------
+
+Release date: Tue Jan  2 23:32:50 UTC 2018
+
+Alexander Schulz (1):
+      improvement: Configurable number of tasks for "Devices" page (TASKS_P…
+
+BadWolf42 (1):
+      Dallas Plugin enhanced : no more "delay()" (#488)
+
+Bartłomiej Zimoń (1):
+      Update _C002.ino (#645)
+
+DaM (1):
+      [Domoticz HTTP] Compatibility fix for BMP280 (#636)
+
+ESPEasy release bot (1):
+      created releasebot script
+
+Edwin Eefting (12):
+      keep TASKS_PER_PAGE at default value of 4
+      fix plugin id (starting with a 0 makes it octal in c++ :( )
+      fix warnings
+      fixed bug in oled upstream lib
+      test fixes
+      smooth out testing code
+      esptest stuff
+      fix travis build errors. disable cpp checking for now
+      set lcd to NULL by default. #584
+      fix illegal string manipulations in PLUGIN_WRITE for some plugins. fixes #347 and #460
+      fix #588. parseTemplate() now only checks enabled taskes for [] macros
+      testing for ds18b20
+
+GHolli (1):
+      Cosmetics: fixing typos. (#628)
+
+Gijs Noorlander (11):
+      P028 to support both BME280 and BMP280 to reduce resource usage (#481)
+      Single function for format to user defined number decimals (#482)
+      OLED framed improve header footer (#495)
+      [SSD1306] Feature/oled 1306 library upgrade (#501)
+      [MH-Z19] Allow for B-version and add filtering (#525)
+      Support both SSD1306 and SH1106 OLED in OLED_Framed plugin (#509)
+      [LCD plugin] Added check of LCD object before dereferencing it (#584)
+      [P039 Thermocouple] Handling negative values and proper error logging (#586)
+      Reduce iRAM usage for plugins using SoftwareSerial (#631)
+      [Security] Add IP-based filtering to web interface and http-commands. (#653)
+      [SDS011] Allow the sensor to sleep to extend sensor lifetime (#668)
+
+Grovkillen (5):
+      Added categories... (#552)
+      Changed bin file names to be more descriptive. (#597)
+      Move "TTP229 keypad" and "Encoder" plugin from "testing" to "normal"  (#619)
+      Updated ESPTOOLS.exe from 0.4.6 to 0.4.12 (#627)
+      Updated "/pinstates" page: Made the plugin number column display "P001" instead of "1" and "P012" instead of "12".
+
+M0ebiu5 (1):
+      P022_PCA9685 added change frequency - P038_NeoPixel added RGBW strips (SK6812) (#638)
+
+Michael (2):
+      WebServer.ino: enhance handle_SDfilelist() (#507)
+      src/Hardware.ino: make it possible to use GPIO-0 (D3) as Pin_sd_cs (#508)
+
+Sen Haerens (1):
+      Enhanced system info layout (#624)
+
+SightofSilence (1):
+      Add System Variable for day, month and year / Fix for "Calculate" function to recognize minus-sign (#485)
+
+SloMusti (1):
+      implemewnted web activity timer tracker (#462)
+
+Tomasz Torcz (1):
+      retain MQTT LWT messages (#516)
+
+denisfrench (1):
+      Set MQTT clientid to %sysname% +/- Settings.Unit (#431) (#436)
+
+fensoft (1):
+      added #define FEATURE_SD (permit a flash size reduction of ~10k) (#568)
+
+hatzlhoffer (1):
+      added new display size 128x32 (#545)
+
+krikk (1):
+      added support for the TSL2591 Sensor based on Adafruit Library (#661)
+
+mvdbro (8):
+      First preparations for ESP32
+      ESP32 IRAM/Deepsleep
+      ESP32 Rules/ADC/PWM
+      ESP32 fix FreeRAM reporting
+      ESP32 Enabled OTA
+      ESP32 fix UDP instability
+      ESP32 fixed chunked HTTP transfer
+      Fix #599
+
+papperone (3):
+      Plugin 073 - 7-segment display plugin TM1637/MAX7219
+      Update _P073_7DGT.ino (#553)
+      deleted GPIO notes referring to 75HC595 not supported (#591)
+
+paulv888 (1):
+      usesID = true (#666)
+
+s0170071 (2):
+      split IP addrress (#605)
+      fix chunking (#649)
+
+sakinit (1):
+      Fix p1 wifi gateway module (#587)
+
+
+-------------------------------------------------
+Changes in release v2.0.0-dev13 (since v2.0.0-dev12)
+-------------------------------------------------
+
+Release date: Tue Jan  2 17:41:19 CET 2018
+
+Edwin Eefting (27):
+      more fixes for #235
+      final fixes for #235, untested. all spiffs errors should be handled now and also show up in logs and webinterface
+      fixed obscure crash caused by not returning a value in #235. we need to adjust compiler flags to detect these kinds of issues.
+      always define PLUGIN_BUILD_NORMAL so normal plugins are compiled
+      cleaned up buildflags and created common build variable
+      solution for better error and warning highlighting when compiling with platformio
+      enabled warnings and started fixing all the warnings to reduce the noise. (because warnings where disabled wasted about 3 hours debugging a simple no-return bug)
+      cleaned up more warnings and fixed a few real bug along the way. #235
+      now using PRAGMA to enable warnings, so that we dont get warnings from core libraries. also warnings will be treated as errors in Travis, this makes approving pull requests less work for me.
+      travis fix
+      worked around error caused by upstream libraries
+      fixes
+      cleaned up notification stuff. fixed #502
+      warnings are treated as errors now, by travis
+      refactored and added automated test stuff
+      examples for the lone wanderer
+      cleaner errors
+      working on test stuff
+      update branching info
+      test library stuff
+      Simple fix for MH-Z19 B version. #529
+      set lcd to NULL by default. #584
+      fix #588. parseTemplate() now only checks enabled taskes for [] macros
+      automaticly updated release notes for v2.0.0-dev13
+      release all binaries by doing the full compile step as last
+      automaticly updated release notes for v2.0.0-dev13
+      still trying to fix travis release scripts..
+
+Gijs Noorlander (9):
+      [INA219] Allow for multiple instances on the same controller (#519)
+      [INA219_v2.0] Improve logs for multiple devices (#546)
+      [LCD plugin] Added check of LCD object before dereferencing it (#584)
+      Move CO2 MH-Z19 plugin from "testing" to "normal" (#618)
+      [DNS/IP] Obey UseDNS setting for all controllers (#629)
+      [v2.0] Add more characters to the list not to escape in URLs (#635)
+      [>49.7 days uptime overflow] Use separate function to compute time differences (#621)
+      [WiFi] Avoid timeouts when not connected to WiFi (#639)
+      [PubSubClient] Bug in handling domainname (#660)
+
+Grovkillen (2):
+      Added categories... (#552)
+      Changed bin file names to be more descriptive. (#597)
+
+Neo (1):
+      [HT16K33_LED] Brightness control (#523)
+
+mvdbro (1):
+      Bugfix: %eventvalue% parsing on literal strings
+
+
+-------------------------------------------------
+Changes in release v2.0.0-dev12 (since v2.0.0-dev11)
+-------------------------------------------------
+
+Release date: Fri Sep 22 01:25:29 CEST 2017
+
+Daniel Tedenljung (1):
+      This plugin is tested and working good. (#428)
+
+Edwin Eefting (6):
+      first set of changes for #235. added spiffs error checking and loging, and cleaner flashguarding code. next change will show feedback in web interface as well. also need to cleanup loose SPIFFS filehandling at other places in webserver.ino (create a save-function for all those things and use FLASH_GUARD)
+      missed return after setting event buffer
+      fixes bug #486 in counter-plugin
+      plugin is not generic enough, so its disabled by default
+      automaticly updated release notes for 2.0.0-dev12
+      fixed release-notes bug
+
+Gerben Meijer (1):
+      Add SENSOR_TYPE_TRIPLE support to Domoticz MQTT (#468)
+
+Gijs Noorlander (1):
+      [MH-Z19] Add 'ABC disable' option to web config (#472)
+
+Jeroen (1):
+      Create _P071_Kamstrup401.ino (#504)
+
+Jochen Krapf (4):
+      Added Plugins for SHT3x and LM75A - Issue #433 (#442)
+      Descriptive GPIO-Names (#448)
+      Rework of Plugin _P056_SDS011-Dust (#451)
+      Fixed HTML text box length for controller settings - Issue #453 (#455)
+
+Ovidiu Schiopu (1):
+      Added _P070_NeoPixel_Clock.ino (#489)
+
+SightofSilence (1):
+      Add files via upload (#493)
+
+beic (2):
+      Moving from Temperature to Environment naming (#492)
+      Moving from Temperature to Environment naming (#506)
+
+mvdbro (4):
+      Custom WEB page handler (SPIFFS)
+      Finished work on Level Control & config
+      Fixed a tasksettings load bug that was introduced with commit dcfc1e3 on july 18th.
+      Moved HTML template logging to level LOG_LEVEL_DEBUG_DEV
+
+papperone (1):
+      HDC1080 plugin (#497)
+
+
+-----------------------------
+Changes in release v2.0.0-dev11
+-----------------------------
+
+Release date: Mon Jul 17 00:55:29 CEST 2017
+
+Daniel Tedenljung (5):
+      Fixed decimal values (#329)
+      Senseair update (#333)
+      Reading error code in other way (#394)
+      Added relay control from commands (#395)
+      Renamed command to be unique. (#427)
+
+DatuX (3):
+      Update README.md
+      Update issue_template.md
+      Update issue_template.md
+
+Edwin Eefting (27):
+      cleaned up RTC initialisation. fixed some fuzzy issues after flashing/factory reset. improved flash-counter messages and added powercycle tips
+      started working on regression testing scripts for The Rig
+      large changes to wifi handling. code cleanup, more efficent connecting, only one connect retry in deepsleep. better serial logging for connections and APmode. always enable ap mode when wifi is disconnected
+      prevent recursion when processing background tasks. might help with issue #117
+      added option do deepsleep on connection failures. had to change boot order a bit, so the rebooted/warmboot message is the first one now. (this also makes more sense). issue #206
+      better rtc error logging
+      Fixed crashbug in email notification
+      Fixed variable naming bug in FEATURE_ADC_VCC
+      working on test framework
+      esptesting framework
+      dont want wifi passwords on github
+      dont want wifi passwords on github
+      converted all commands to python
+      backup
+      saved ~800 bytes ram in handle_devices(), issue #352. left old code commented for reference, in case i created bugs. will remove later
+      accidently enabled FEATURE_ARDUINO_OTA
+      fix #372
+      serial now no longer resonds to empty commands
+      add caching headers to static content
+      upgraded IRremoteESP8266 from v1.0.2 to v1.2.0. fixes #188
+      fix HTTP chunked transfer encoding, since WebServer class doesnt support it. this fixes the 2 second delay in some browsers. (we where out of spec.)
+      more details AP mode serial output
+      made mdns a feature. consitent use of hostname for both mdns and dhcp client. hostname now is name_unitnumber, with spaces replaced by -
+      gave some html logging debug-level
+      imlemented setting name, unit and password via serial. implements #317
+      added note to inverse logic to fix #318
+      automaticly updated release notes for v2.0.0-dev11
+
+Gustavo Spadari (1):
+      Adding comments on RAW code (#386) (#393)
+
+JK (7):
+      First draft
+      Send web page as junked data
+      Accept CR and LF at serial commands
+      First draft
+      Added Plugin for Touch KeyPad Chip TTP229
+      Fine tuning of CSS and menu
+      Reenabled javascript for device-selector
+
+Jochen Krapf (25):
+      Added _P054_DMX512 (#322)
+      Added _P055_Chiming (#323)
+      Added _P056_SDS011-Dust (#324)
+      Added Plugin for Quadrature Encoder Interface (Rotary Encoder) (#335)
+      Added Plugin _P061_KeyPad (#340)
+      Added Plugin _P060_MCP3221 (#342)
+      Formula option for  _P013_HCSR04 plugin issue #343 #313 (#344)
+      Fixed issues #308 #305 (#345)
+      Added Plugin _P062_MPR121_KeyPad (#346)
+      Fixed issue #348 (#349)
+      Added plugins for HT16K33 LED matrix driver and key pad scanner (#328)
+      Increase DEVICES_MAX for more testing and dev plugins (#353)
+      Write default CSS to SPIFFS on boot (#357)
+      Fixed DEVICES_MAX for testing and dev (#374)
+      Step back to style-based-css for speed up + pimp menu (#376)
+      Check plugin-array size on init - issue #119 (#389)
+      Added Plugin for MP3 module (#402)
+      Minor corrections and documentation (#404)
+      Added Plugin for Gesture Sensor APDS9960 (#409)
+      Added Plugin for Color Sensor VEML6040 (#412)
+      Added Plugin for HX711 Load Cell - Request #408 (#415)
+      Fixed multiline define bug on CRLF (#416)
+      Added Value Logger on SD Card (#429)
+      Plugin65 MP3 - volume updated in device menu - issue #424 (#438)
+      Plugin HX711 - Added Tare function (#419)
+
+PieVo (1):
+      Update P053 (PMSx003) to support software serial and minor cleanup (#390)
+
+SloMusti (3):
+      fixed deep sleep, such that it can be enabled from Rules (#375)
+      Implemented a better WiFI AP naming strategy. ESP_Easy has replaced the newdevice text as the default name and now the name is used as and AP SSID (#410)
+      added mDNS implementation (#418)
+
+elucas2uy (1):
+      FIX Pass and Index on handle_controllers() (#331)
+
+imthemichi (1):
+      Plugin_008-RFID extended with wiegand 34-bits and key-pad (#387)
+
+krikk (5):
+      changed the ina219 plugin so that is always sends 3 values, voltage, current, power... like a normal plugin should do... (#325)
+      delay option should be displayed even if the SendDataOption is false, because the delay option also controls the refresh rate of the oled display... fixes issue #336 (#339)
+      seconds were displayed without leading zero issue #337 (#338)
+      added local ip to sysinfo plugin, due to limitation of return type float, i had to split up the ip in its octets... fixes issue #228 (#341)
+      implemented a measurement type selection to retain backward compability to Domoticz... hope this works... (#351)
+
+mvdbro (8):
+      Fix Domoticz helper plugin  #330
+      Enlarge MQTT buffer for Domoticz MQTT controller
+      MQTT Controller enable/disable fix (#287)
+      Fix incorrect ADC GPIO display
+      Fix default controller settings (#360)
+      Added pin state buffer table page (mainly for debugging)
+      Update checkRAM function
+      Revert to default ESP Easy colorscheme
+
+papperone (5):
+      Fixed Broken P038
+      p038
+      reverted some changes due to bug fixed in the "webserver.ino #348"
+      P038 - optimization
+      P010 plugin optimization (#403)
+
+tedenda (2):
+      Renamed Prefix from P011 to C011
+      Missed one...
+
+
+-----------------------------
+Changes in release v2.0.0-dev10
+-----------------------------
+
+Release date: Mon May 29 22:53:54 CEST 2017
+
+DatuX (1):
+      Update README.md
+
+Jochen Krapf (1):
+      Rework of plugin ADC (#319)
+
+krikk (1):
+      reverted change, this fix seems to have exactly opposite outcome than expected... with the fix applied i get errors, without is i get no errors... (#320)
+
+
+-----------------------------
+Changes in release v2.0.0-dev9
+-----------------------------
+
+Release date: Sun May 28 15:16:00 CEST 2017
+
+Alex Schwantes (1):
+      Implemented use of addFormSelector methods to _P004_Dallas plugin.     Changed the device select box to show the one wire address for each connected sensor instead of just a number.     Added a blank option to the device address select box so that in the event that multiple devices are present and the configured device is not currently available, the select box will be blank instead of selecting a different device.
+
+Bartlomiej Zimon (5):
+      - Misc: typo
+      Custom Controller Settings - add controller index
+      Push ProtocolIndex and ControllerIndex into CPLUGIN_WEBFORM_SAVE/LOAD
+      Add WifiSSID2,WifiKey2 commands
+      Add backup Wifi network to Settings command
+
+Blair Thompson (1):
+      Added Par4 and Par5 Variables (#248)
+
+Daniel Tedenljung (5):
+      Updated wrong plugin number. (#269)
+      P052: More descriptive  log messages (#283)
+      GUI touchup on Tools (#286)
+      addSubmitButton function added (#289)
+      New look on Tools page (#296)
+
+DatuX (5):
+      Update README.md
+      Update issue_template.md
+      Update CONTRIBUTING.md
+      Update README.md
+      Update README.md
+
+Edwin Eefting (17):
+      cleaned up messagedelay: use the same function everywhere. and do serial processing as well during the messagedelay
+      fixed issue #253 (memory leaks/crashes)
+      more details in memory analyser. run memory analyser via Travis
+      cosmetic buildlog fix
+      publish MQTT Connected message
+      timer boundschecker was off by one. fixed memanalyser total
+      input box fix on setting pages
+      comments. checkudp only in backgroundtasks()
+      reboot and wifidisconnect should be handled by /
+      bugfix in rtc checksum
+      nicer sleep messages
+      fixed a few out of bounds bugs in Misc.ino _P023_OLED.ino _P035_IRTX.ino _P037_MQTTImport.ino with cppcheck. also added cppcheck to travis to prevent such cases in the future
+      fixing cpp check
+      fixing cpp check
+      fixing cpp check
+      fixing cpp check
+      also distribute ESP8285 binaries
+
+JK (5):
+      added functions addCheckBox and addNumericBox
+      added checkbox for status LED inversed
+      fine tuning of status LED and pimp hardware web site
+      solved my commit mismatch
+      Fixed #196 and rework of IDX display
+
+Jochen Krapf (11):
+      Added addForm*-functions for easy web-interface and pimp GUI (#259)
+      Added function addFormSelector (#270)
+      Preliminary final draft of bugfix #264 (#271)
+      Replaced HTML code with addFormSelector() in all plugins (#278)
+      Fixed readUserVarFromRTC() #265 (#280)
+      Limits to NumericBox and a bit of security to PasswordBox (#281)
+      Added HTML templates for customization (#290)
+      Fixed rules bug #297 (#299)
+      Pimp device-GUI and optimized HTML (#306)
+      Fixed some minor HTML syntax bugs (#310)
+      Rework of plugin ADS1115 (#315)
+
+PieVo (1):
+      Plantower (#300)
+
+beic (1):
+      Some little description corrections (#297)
+
+krikk (13):
+      http advanced controller, correct passing of hostname (#250)
+      i2c Temperatur & Humidity Sensor Am2320 (#251)
+      use the new addCheckBox function and better display of device config page
+      another fix to http advanced...
+      replaced static html code with the new addForm* Functions
+      bug fix wrong return type + form function fixes (#266)
+      addFormNumeric with min and max & More Form-Function replacements (#272)
+      make the Settings - Save. Filename more descriptive... (#273)
+      addHelpButton Function and a new Help Button for the Rules and Hardware Page (#282)
+      DHT plugin fix 'NaN' issue (#285)
+      i don't like hidden features, added a json button to the tools menu, next to the advanced button (#292)
+      do a dns lookup on every request, solves issue #261 (#302)
+      AM2320: negative temperature fix... (#312)
+
+tedenda (1):
+      Moving plugin from Playground into main repo. (#262)
+
+
+-----------------------------
+Changes in release v2.0.0-dev8
+-----------------------------
+
+Release date: Mon Apr 24 13:21:32 CEST 2017
+
+DatuX (6):
+      Update README.md
+      Update README.md
+      Update README.md
+      Update CONTRIBUTING.md
+      Update CONTRIBUTING.md
+      Update README.md
+
+David Conran (2):
+      Update IRremoteESP8266 library url in .gitmodules
+      update sendSony() call to use repeats.
+
+Dirk Moeller (2):
+      new function, Plugin_004_DS_setResolution und Plugin_004_DS_getResolution
+      fix typo
+
+Edwin Eefting (36):
+      temporary disabled IR plugins, because of iram1_0_seg issues
+      initial version of memory analyser
+      moved arduinojson and liquidcrytal includes to correct plugins. reanbled IR-modules to solve memory issues
+      make the IRTX plugin work without the IR plugin
+      initial memory analyser and results
+      reduced memory usage _C001
+      reduced mem C001 C002
+      reduced ram usage C003 ... C011
+      reduce memory usage N001 N002
+      cleaned up servo stuff
+      recuded number of pulsecounters from 8 to 4 to save IRAM
+      contributing guidelines
+      fixed crash in C001 (when opening /controllers)
+      avoid static buffers in c001. addLog now also supports F(), so we dont need all those temporary variable definitions
+      removed unneccesay delays from c001
+      avoid unneccesary string conversions and static buffers in c001
+      fixed crashes caused by large MQTT packets
+      fixed lots of common issues that might cause crashes in c011. also see https://github.com/letscontrolit/ESPEasy/issues/117#issuecomment-293713370
+      added issue template to get cleaner bug reports
+      replaced all readstringuntil() with safeReadStringUntil()
+      starting working on stability reporting function
+      fixed stability issues in c009. probably caused by illegal PSTR usage, but i completly cleaned up all string handling
+      improved statusled handling in background tasks
+      converted submodule to normal directory. lib/Adafruit_Motor_Shield_V2 upstream commit ee4c4d334f498d54cdf80c9cc6f5bdec2533f8bf
+      now no longer a submodule lib/AS_BH1750, upstream version 092f0b1c5fa74eb2abe3d1b2925190d066e9506d
+      now no longer a submodule. lib/Adafruit_NeoPixel, upstream version v1.0.6
+      now no longer a submodule, lib/Adafruit_TCS34725 upstream version 1.0.1-13-g12be4c6
+      now no longer a submodule. lib/ArduinoJson upstream version v5.6.4
+      now no longer a submodule. lib/IRremoteESP8266 upstream version v1.0.2
+      oops moved lib/Adafruit_TCS34725 to wrong place
+      select env
+      Revert "Plugin_008-RFID extended with wiegand 34-bits and key-pad (4-bits per key) support". Now uses too much IRAM.
+      dont use arduino OTA in the dev env
+      escape html in the rules page, so that strings like &param do not cause problems. fixes issue #231
+      properly escape html in C011 generic http advanced.
+      fixed #239 due to improper PSTR. cleaned up string handling
+
+Emmanuel Tatto (1):
+      getBearing should be outside the FEATURE_ARDUINO_OTA condition (#207)
+
+Gerben Meijer (1):
+      Extend MH-Z19 sensor support
+
+JK (3):
+      More informative and intuitive status LED
+      Using 3 I/O-pins consequently
+      added union to TaskDevicePin1..3
+
+Jochen Krapf (1):
+      Added function isDeepSleepEnabled() (#177)
+
+adb76 (2):
+      Set BME280 to recommended values for climate / weather sensor
+      BME280: Ensure sensor is in sleep mode to set the config, fix small typo
+
+beic (13):
+      Menu correction, added BMP180 (#199)
+      Added detection for the HTU21D to I2C scenner
+      Environment naming will better fit in...
+      Environment naming will better fit in + HTU21D
+      Environment naming will better fit in... + naming
+      Environment naming will better fit in...
+      Environment naming will better fit in...
+      Environment naming will better fit in...
+      Environment naming will better fit in...
+      Environment naming will better fit in...
+      Little naming correction
+      Naming correction by Datasheet
+      Added detection for the SI1145 to I2C scenner
+
+dev0 (1):
+      _C009.ino: RFC conformity and removed obsolet code (#163)
+
+imthemichi (1):
+      Plugin_008-RFID extended with wiegand 34-bits and key-pad (4-bits per key) support
+
+jbaumann (1):
+      Addition of ESP8285 targets (#187)
+
+krikk (16):
+      motorshield library should be a submodule, enhanced the motorshield plugin... (#162)
+      http advanced: add replacement variable for systime, vcc, ip, sysload, uptime (#167)
+      corrected name for TSL2561, add option to use different sensor adress (#170)
+      re-did old pull requests (#172)
+      Tsl2561 rewrite (#174)
+      I2csoilmoisture fixed bug with sleep mode (#178)
+      Pulsecounter minor fix (#184)
+      rewrote bh1750 sensor based on better library... (#182)
+      cppcheck style fixes... (#186)
+      added i2c address selection to ino219 plugin (#192)
+      Motorshield plugin string fixes (#200) (reduced memory usage)
+      Support for Tcs34725 RGB Color Sensor (#195)
+      _P047_i2c-soil-moisture-sensor: allow change of sensor address (#201)
+      Httpadvanced crashfix + patch method (#204)
+      Bh1750: enhance to check for valid value (#208)
+      removed all unnecessary Strings due to new addLog with FlashStringHelper (#223)
+
+tedenda (1):
+      Update _P049_MHZ19.ino
+
+
 -----------------------------
 Changes in release v2.0.0-dev7
 -----------------------------

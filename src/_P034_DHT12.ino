@@ -4,7 +4,7 @@
 
 #define PLUGIN_034
 #define PLUGIN_ID_034         34
-#define PLUGIN_NAME_034       "Temperature & Humidity - DHT12 (I2C)"
+#define PLUGIN_NAME_034       "Environment - DHT12 (I2C)"
 #define PLUGIN_VALUENAME1_034 "Temperature"
 #define PLUGIN_VALUENAME2_034 "Humidity"
 
@@ -50,9 +50,9 @@ boolean Plugin_034(byte function, struct EventStruct *event, String& string)
     case PLUGIN_READ:
       {
         byte dht_dat[5];
-        byte dht_in;
+        // byte dht_in;
         byte i;
-        byte Retry = 0;
+        // byte Retry = 0;
         boolean error = false;
 
         Wire.beginTransmission(DHT12_I2C_ADDRESS); // start transmission to device
@@ -101,8 +101,7 @@ boolean Plugin_034(byte function, struct EventStruct *event, String& string)
         } // error
         if(!success)
         {
-          String log = F("DHT12: No reading!");
-          addLog(LOG_LEVEL_INFO, log);
+          addLog(LOG_LEVEL_INFO, F("DHT12: No reading!"));
           UserVar[event->BaseVarIndex] = NAN;
           UserVar[event->BaseVarIndex + 1] = NAN;
         }

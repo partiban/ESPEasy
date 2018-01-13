@@ -17,23 +17,23 @@
 // included in all copies or substantial portions of the Software.
 
 
-// This plugin enables the use of a MPU6050 sensor as e.g. used in the breakoutboard GY-521.
+// This plugin enables the use of a MPU6050 sensor as e.g. used in the breakout-board GY-521.
 // Using the webform you can set thresholds for the x-y-z axis and timeout values. If the thresholds are
 // exceeded the sensor is on, if the thresholds are not met during the timeout period the sensor is off.
 
-// Using this plugin you can get a notification from your home automationsystem when the monitored machine or
-// device is no longer vibrating and thus this can be used as a signaling device for the end of a (dish)washer
+// Using this plugin you can get a notification from your home automation system when the monitored machine or
+// device is no longer vibrating and thus this can be used as a signalling device for the end of a (dish)washer
 // or dryer cycle.
 
-// You can also use the plugin to read raw sensorvalues. You can use more then one instance of the plugin and
+// You can also use the plugin to read raw sensor values. You can use more then one instance of the plugin and
 // you can set multiple movement alarms by giving each instance other threshold values if needed.
 
-// Best practise: Create three custom sensors in your homecontroller (like domoticz) and let it plot the x, y and
-// z range. Plot the sensorvalues while you use the washingmachine and/or dryer. Also keep monitoring when they
+// Best practise: Create three custom sensors in your home controller (like domoticz) and let it plot the x, y and
+// z range. Plot the sensor values while you use the washing machine and/or dryer. Also keep monitoring when they
 // are not in use so you can determine the needed thresholds. When you have these you can select the movement
 // detection function to setup the plugin for further use.
 
-// The plugin can simultanious be used with two MPU6050 devices by adding multiple instances.
+// The plugin can be used simultaneously with two MPU6050 devices by adding multiple instances.
 // Originally released in the PlayGround as Plugin 118.
 
 // Plugin var usage:
@@ -73,11 +73,11 @@
 
 #define PLUGIN_045
 #define PLUGIN_ID_045                       45
-#define PLUGIN_NAME_045                     "MPU 6050 [TESTING]"
+#define PLUGIN_NAME_045                     "Gyro - MPU 6050 [TESTING]"
 #define PLUGIN_VALUENAME1_045               ""
 
 int16_t _P045_axis[3][5][2];                // [xyz], [min/max/range,a,g], [0x68/0x69]
-long _P045_time[2];
+unsigned long _P045_time[2];
 
 boolean Plugin_045(byte function, struct EventStruct *event, String& string)
 {
@@ -114,28 +114,19 @@ boolean Plugin_045(byte function, struct EventStruct *event, String& string)
       {
         // Setup webform for address selection
         byte choice = Settings.TaskDevicePluginConfig[event->TaskIndex][0];
+        /*
         String options[10];
         options[0] = F("0x68 - default settings (ADDR Low)");
         options[1] = F("0x69 - alternate settings (ADDR High)");
+        */
         int optionValues[2];
         optionValues[0] = 0x68;
         optionValues[1] = 0x69;
-        string += F("<TR><TD>I2C Address:<TD><select name='plugin_045_address'>");
-        for (byte x = 0; x < 2; x++)
-        {
-          string += F("<option value='");
-          string += optionValues[x];
-          string += "'";
-          if (choice == optionValues[x])
-            string += F(" selected");
-          string += ">";
-          string += options[x];
-          string += F("</option>");
-        }
-        string += F("</select>");
-        // Setup webform for instance function
+        addFormSelectorI2C(string, F("plugin_045_address"), 2, optionValues, choice);
+        addFormNote(string, F("ADDR Low=0x68, High=0x69"));
+
         choice = Settings.TaskDevicePluginConfig[event->TaskIndex][1];
-        string += F("<TR><TD>Function:<TD><select name='plugin_045_function'>");
+        String options[10];
         options[0] = F("Movement detection");
         options[1] = F("Range acceleration X");
         options[2] = F("Range acceleration Y");
@@ -146,45 +137,29 @@ boolean Plugin_045(byte function, struct EventStruct *event, String& string)
         options[7] = F("G-force X");
         options[8] = F("G-force Y");
         options[9] = F("G-force Z");
-        for (byte x = 0; x < 10; x++)
-        {
-          string += F("<option value='");
-          string += x;
-          string += "'";
-          if (choice == x)
-            string += F(" selected");
-          string += ">";
-          string += options[x];
-          string += F("</option>");
-        }
-        string += F("</select>");
+        addFormSelector(string, F("Function"), F("plugin_045_function"), 10, options, NULL, choice);
+
         if (choice == 0) {
           // If this is instance function 0, setup webform for additional vars
           // Show some user information about the webform and what the vars mean.
           string += F("<TR><TD><TD>The thresholdvalues (0-65535) can be used to set a threshold for one or more<br>");
           string += F("axis. The axis will trigger when the range for that axis exceeds the threshold<br>");
           string += F("value. A value of 0 disables movement detection for that axis.");
-          string += F("<TR><TD>Detection threshold X:<TD><input type='text' size='6' maxlength='6' name='plugin_045_threshold_x' value='");
-          string += Settings.TaskDevicePluginConfig[event->TaskIndex][2];
-          string += F("'>");
-          string += F("<TR><TD>Detection threshold Y:<TD><input type='text' size='6' maxlength='6' name='plugin_045_threshold_y' value='");
-          string += Settings.TaskDevicePluginConfig[event->TaskIndex][3];
-          string += F("'>");
-          string += F("<TR><TD>Detection threshold Z:<TD><input type='text' size='6' maxlength='6' name='plugin_045_threshold_z' value='");
-          string += Settings.TaskDevicePluginConfig[event->TaskIndex][4];
-          string += F("'>");
+
+        	addFormNumericBox(string, F("Detection threshold X"), F("plugin_045_threshold_x"), Settings.TaskDevicePluginConfig[event->TaskIndex][2], 0, 65535);
+        	addFormNumericBox(string, F("Detection threshold Y"), F("plugin_045_threshold_y"), Settings.TaskDevicePluginConfig[event->TaskIndex][3], 0, 65535);
+        	addFormNumericBox(string, F("Detection threshold Z"), F("plugin_045_threshold_z"), Settings.TaskDevicePluginConfig[event->TaskIndex][4], 0, 65535);
+
           string += F("<TR><TD><TD>Each 30 seconds a counter for the detection window is increased plus all axis<br>");
           string += F("are checked and if they *all* exceeded the threshold values, a counter is increased.<br>");
           string += F("Each period, defined by the [detection window], the counter is checked against<br>");
           string += F("the [min. detection count] and if found equal or larger, movement is detected.<br>");
           string += F("If in the next window the [min. detection count] value is not met, movement has stopped.");
           string += F("The [detection window] cannot be smaller than the [min. detection count].");
-          string += F("<TR><TD>Min. detection count:<TD><input type='text' size='6' maxlength='6' name='plugin_045_threshold_counter' value='");
-          string += Settings.TaskDevicePluginConfig[event->TaskIndex][5];
-          string += F("'>");
-          string += F("<TR><TD>Detection window:<TD><input type='text' size='6' maxlength='6' name='plugin_045_threshold_window' value='");
-          string += Settings.TaskDevicePluginConfig[event->TaskIndex][6];
-          string += F("'>");
+
+        	addFormNumericBox(string, F("Min. detection count"), F("plugin_045_threshold_counter"), Settings.TaskDevicePluginConfig[event->TaskIndex][5], 0, 999999);
+        	addFormNumericBox(string, F("Detection window"), F("plugin_045_threshold_window"), Settings.TaskDevicePluginConfig[event->TaskIndex][6], 0, 999999);
+
         }
         success = true;
         break;
@@ -193,20 +168,13 @@ boolean Plugin_045(byte function, struct EventStruct *event, String& string)
     case PLUGIN_WEBFORM_SAVE:
       {
         // Save the vars
-        String plugin1 = WebServer.arg("plugin_045_address");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][0] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_function");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][1] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_threshold_x");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][2] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_threshold_y");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][3] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_threshold_z");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][4] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_threshold_counter");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][5] = plugin1.toInt();
-        plugin1 = WebServer.arg("plugin_045_threshold_window");
-        Settings.TaskDevicePluginConfig[event->TaskIndex][6] = plugin1.toInt();
+        Settings.TaskDevicePluginConfig[event->TaskIndex][0] = getFormItemInt(F("plugin_045_address"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][1] = getFormItemInt(F("plugin_045_function"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][2] = getFormItemInt(F("plugin_045_threshold_x"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][3] = getFormItemInt(F("plugin_045_threshold_y"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][4] = getFormItemInt(F("plugin_045_threshold_z"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][5] = getFormItemInt(F("plugin_045_threshold_counter"));
+        Settings.TaskDevicePluginConfig[event->TaskIndex][6] = getFormItemInt(F("plugin_045_threshold_window"));
         if (Settings.TaskDevicePluginConfig[event->TaskIndex][6] < Settings.TaskDevicePluginConfig[event->TaskIndex][5]) {
           Settings.TaskDevicePluginConfig[event->TaskIndex][6] = Settings.TaskDevicePluginConfig[event->TaskIndex][5];
         }
@@ -271,7 +239,7 @@ boolean Plugin_045(byte function, struct EventStruct *event, String& string)
         addLog(LOG_LEVEL_INFO,log);
 */
         // Run this bit every 5 seconds per deviceaddress (not per instance)
-        if ((_P045_time[dev] + 5000) < millis())
+        if (timeOutReached(_P045_time[dev] + 5000))
         {
           _P045_time[dev] = millis();
 
@@ -325,8 +293,8 @@ boolean Plugin_045(byte function, struct EventStruct *event, String& string)
               }
 
               // Check if UserVar changed so we do not overload homecontroller with the same readings
-              if (Settings.TaskDevicePluginConfigLong[event->TaskIndex][7] != UserVar[event->BaseVarIndex]) {
-                Settings.TaskDevicePluginConfigLong[event->TaskIndex][7] = UserVar[event->BaseVarIndex];
+              if (Settings.TaskDevicePluginConfig[event->TaskIndex][7] != UserVar[event->BaseVarIndex]) {
+                Settings.TaskDevicePluginConfig[event->TaskIndex][7] = UserVar[event->BaseVarIndex];
                 success = true;
               } else {
                 success = false;

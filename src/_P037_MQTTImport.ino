@@ -8,7 +8,7 @@
 
 #define PLUGIN_037
 #define PLUGIN_ID_037         37
-#define PLUGIN_NAME_037       "MQTT Import"
+#define PLUGIN_NAME_037       "Generic - MQTT Import"
 
 #define PLUGIN_VALUENAME1_037 "Value1"
 #define PLUGIN_VALUENAME2_037 "Value2"
@@ -39,7 +39,7 @@ boolean Plugin_037(byte function, struct EventStruct *event, String& string)
     case PLUGIN_DEVICE_ADD:
       {
         Device[++deviceCount].Number = PLUGIN_ID_037;
-        Device[deviceCount].Type = SENSOR_TYPE_SWITCH;
+        Device[deviceCount].Type = DEVICE_TYPE_DUMMY;
         Device[deviceCount].VType = SENSOR_TYPE_SINGLE;     // This means it has a single pin
         Device[deviceCount].Ports = 0;
         Device[deviceCount].PullUpOption = false;
@@ -73,13 +73,8 @@ boolean Plugin_037(byte function, struct EventStruct *event, String& string)
 
         for (byte varNr = 0; varNr < 4; varNr++)
         {
-          string += F("<TR><TD>MQTT Topic ");
-          string += varNr + 1;
-          string += F(":<TD><input type='text' size='40' maxlength='40' name='Plugin_037_template");
-          string += varNr + 1;
-          string += F("' value='");
-          string += deviceTemplate[varNr];
-          string += F("'>");
+        	addFormTextBox(string, String(F("MQTT Topic ")) + (varNr + 1), String(F("Plugin_037_template")) +
+        			(varNr + 1), deviceTemplate[varNr], 40);
         }
         success = true;
         break;
@@ -137,8 +132,7 @@ boolean Plugin_037(byte function, struct EventStruct *event, String& string)
 
         if (!MQTTclient_037->connected()) {
 
-          String log = F("IMPT : MQTT 037 Connection lost");
-          addLog(LOG_LEVEL_ERROR, log);
+          addLog(LOG_LEVEL_ERROR, F("IMPT : MQTT 037 Connection lost"));
 
           MQTTclient_037->disconnect();
           delay(1000);
@@ -341,11 +335,15 @@ boolean MQTTConnect_037(String clientid)
 
   if (MQTTclient_037->connected())return true;
 
-  IPAddress MQTTBrokerIP(ControllerSettings.IP);
-
   // define stuff for the client - this could also be done in the intial declaration of MQTTclient_037
-
-  MQTTclient_037->setServer(MQTTBrokerIP, ControllerSettings.Port);
+  if (WiFi.status() != WL_CONNECTED) {
+    return false; // Not connected, so no use in wasting time to connect to a host.
+  }
+  if (ControllerSettings.UseDNS) {
+    MQTTclient_037->setServer(ControllerSettings.getHost().c_str(), ControllerSettings.Port);
+  } else {
+    MQTTclient_037->setServer(ControllerSettings.getIP(), ControllerSettings.Port);
+  }
   MQTTclient_037->setCallback(mqttcallback_037);
 
   //  Try three times for a connection
@@ -470,7 +468,6 @@ float string2float(String myString) {
 
   if (myString.substring(0, 1) == "-") {
     start = 1;   //allow a minus in front of string
-    tmp[i] = '-';
   }
 
   for (i = start; i < len; i++)

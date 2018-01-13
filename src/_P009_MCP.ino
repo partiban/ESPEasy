@@ -46,11 +46,7 @@ boolean Plugin_009(byte function, struct EventStruct *event, String& string)
 
     case PLUGIN_WEBFORM_LOAD:
       {
-        string += F("<TR><TD>Send Boot state:<TD>");
-        if (Settings.TaskDevicePluginConfig[event->TaskIndex][0])
-          string += F("<input type=checkbox name=plugin_009_boot checked>");
-        else
-          string += F("<input type=checkbox name=plugin_009_boot>");
+        addFormCheckBox(string, F("Send Boot state") ,F("plugin_009_boot"), Settings.TaskDevicePluginConfig[event->TaskIndex][0]);
 
         success = true;
         break;
@@ -58,9 +54,7 @@ boolean Plugin_009(byte function, struct EventStruct *event, String& string)
 
     case PLUGIN_WEBFORM_SAVE:
       {
-
-        String plugin1 = WebServer.arg(F("plugin_009_boot"));
-        Settings.TaskDevicePluginConfig[event->TaskIndex][0] = (plugin1 == "on");
+        Settings.TaskDevicePluginConfig[event->TaskIndex][0] = isFormItemChecked(F("plugin_009_boot"));
 
         success = true;
         break;
@@ -113,7 +107,7 @@ boolean Plugin_009(byte function, struct EventStruct *event, String& string)
         success = true;
         break;
       }
-      
+
     case PLUGIN_WRITE:
       {
         String log = "";
@@ -272,15 +266,16 @@ boolean Plugin_009_Write(byte Par1, byte Par2)
     Wire.endTransmission();
     success = true;
   }
+  return(success);
 }
 
 
 //********************************************************************************
 // MCP23017 config
 //********************************************************************************
-boolean Plugin_009_Config(byte Par1, byte Par2)
+void Plugin_009_Config(byte Par1, byte Par2)
 {
-  boolean success = false;
+  // boolean success = false;
   byte portvalue = 0;
   byte unit = (Par1 - 1) / 16;
   byte port = Par1 - (unit * 16);
@@ -311,4 +306,3 @@ boolean Plugin_009_Config(byte Par1, byte Par2)
     Wire.endTransmission();
   }
 }
-

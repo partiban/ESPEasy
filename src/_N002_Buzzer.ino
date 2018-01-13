@@ -26,37 +26,30 @@ boolean NPlugin_002(byte function, struct EventStruct *event, String& string)
         break;
       }
 
-    case NPLUGIN_WRITE:
-      {
-        String log = "";
-        String command = parseString(string, 1);
-
-        if (command == F("buzzer"))
-        {
-          NotificationSettingsStruct NotificationSettings;
-          LoadNotificationSettings(event->NotificationIndex, (byte*)&NotificationSettings, sizeof(NotificationSettings));
-          success = true;
-        }
-        break;
-      }
+    // Edwin: Not used/not implemented, so disabled for now.
+    // case NPLUGIN_WRITE:
+    //   {
+    //     String log = "";
+    //     String command = parseString(string, 1);
+    //
+    //     if (command == F("buzzer"))
+    //     {
+    //       NotificationSettingsStruct NotificationSettings;
+    //       LoadNotificationSettings(event->NotificationIndex, (byte*)&NotificationSettings, sizeof(NotificationSettings));
+    //       success = true;
+    //     }
+    //     break;
+    //   }
 
     case NPLUGIN_NOTIFY:
       {
         NotificationSettingsStruct NotificationSettings;
         LoadNotificationSettings(event->NotificationIndex, (byte*)&NotificationSettings, sizeof(NotificationSettings));
-        NPlugin_002_tone(NotificationSettings.Pin1, 500, 500);
+        //this reserves IRAM and uninitialized RAM
+        tone(NotificationSettings.Pin1, 500, 500);
         success = true;
       }
 
   }
   return success;
 }
-
-void NPlugin_002_tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
-
-analogWriteFreq(frequency);
-analogWrite(_pin,100);
-delay(duration);
-analogWrite(_pin,0);
-} 
-

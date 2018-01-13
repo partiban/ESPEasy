@@ -1,7 +1,7 @@
 //********************************************************************************
 // Interface for Sending to Controllers
 //********************************************************************************
-boolean sendData(struct EventStruct *event)
+void sendData(struct EventStruct *event)
 {
   LoadTaskSettings(event->TaskIndex);
   if (Settings.UseRules)
@@ -10,21 +10,26 @@ boolean sendData(struct EventStruct *event)
   if (Settings.GlobalSync && Settings.TaskDeviceGlobalSync[event->TaskIndex])
     SendUDPTaskData(0, event->TaskIndex, event->TaskIndex);
 
+  if (Settings.UseValueLogger && Settings.InitSPI && Settings.Pin_sd_cs >= 0)
+    SendValueLogger(event->TaskIndex);
+
 //  if (!Settings.TaskDeviceSendData[event->TaskIndex])
 //    return false;
 
   if (Settings.MessageDelay != 0)
   {
-    uint16_t dif = millis() - lastSend;
-    if (dif < Settings.MessageDelay)
+    const long dif = timePassedSince(lastSend);
+    if (dif > 0 && dif < static_cast<long>(Settings.MessageDelay))
     {
       uint16_t delayms = Settings.MessageDelay - dif;
-      char log[30];
-      sprintf_P(log, PSTR("HTTP : Delay %u ms"), delayms);
-      addLog(LOG_LEVEL_DEBUG_MORE, log);
-      unsigned long timer = millis() + delayms;
-      while (millis() < timer)
-        backgroundtasks();
+      //this is logged nowhere else, so might as well disable it here also:
+      // addLog(LOG_LEVEL_DEBUG_MORE, String(F("CTRL : Message delay (ms): "))+delayms);
+
+     delayBackground(delayms);
+
+      // unsigned long timer = millis() + delayms;
+      // while (!timeOutReached(timer))
+      //   backgroundtasks();
     }
   }
 
@@ -34,34 +39,71 @@ boolean sendData(struct EventStruct *event)
   {
     event->ControllerIndex = x;
     event->idx = Settings.TaskDeviceID[x][event->TaskIndex];
-
-    if (Settings.TaskDeviceSendData[event->ControllerIndex][event->TaskIndex] && Settings.ControllerEnabled[event->ControllerIndex] && Settings.Protocol[event->ControllerIndex])
+    if (Settings.TaskDeviceSendData[event->ControllerIndex][event->TaskIndex] &&
+        Settings.ControllerEnabled[event->ControllerIndex] && Settings.Protocol[event->ControllerIndex])
     {
       event->ProtocolIndex = getProtocolIndex(Settings.Protocol[event->ControllerIndex]);
-      CPlugin_ptr[event->ProtocolIndex](CPLUGIN_PROTOCOL_SEND, event, dummyString);
+      if (validUserVar(event)) {
+        CPlugin_ptr[event->ProtocolIndex](CPLUGIN_PROTOCOL_SEND, event, dummyString);
+      } else {
+        String log = F("Invalid value detected for controller ");
+        String controllerName;
+        CPlugin_ptr[event->ProtocolIndex](CPLUGIN_GET_DEVICENAME, event, controllerName);
+        log += controllerName;
+        addLog(LOG_LEVEL_DEBUG, log);
+      }
     }
   }
-  
+
   PluginCall(PLUGIN_EVENT_OUT, event, dummyString);
   lastSend = millis();
 }
 
+boolean validUserVar(struct EventStruct *event) {
+  for (int i = 0; i < VARS_PER_TASK; ++i) {
+    const float f(UserVar[event->BaseVarIndex + i]);
+    if (f == NAN)      return false; //("NaN");
+    if (f == INFINITY) return false; //("INFINITY");
+    if (-f == INFINITY)return false; //("-INFINITY");
+    if (isnan(f))      return false; //("isnan");
+    if (isinf(f))      return false; //("isinf");
+  }
+  return true;
+}
 
 /*********************************************************************************************\
  * Handle incoming MQTT messages
 \*********************************************************************************************/
 // handle MQTT messages
 void callback(char* c_topic, byte* b_payload, unsigned int length) {
-  char log[256];
-  char c_payload[256];
-  strncpy(c_payload,(char*)b_payload,length);
-  c_payload[length] = 0;
+  // char log[256];
+  char c_payload[384];
+
   statusLED(true);
 
-  sprintf_P(log, PSTR("%s%s"), "MQTT : Topic: ", c_topic);
+  if (length>sizeof(c_payload)-1)
+  {
+    addLog(LOG_LEVEL_ERROR, F("MQTT : Ignored too big message"));
+    return;
+  }
+
+  //convert payload to string, and 0 terminate
+  strncpy(c_payload,(char*)b_payload,length);
+  c_payload[length] = 0;
+
+  String log;
+  log=F("MQTT : Topic: ");
+  log+=c_topic;
   addLog(LOG_LEVEL_DEBUG, log);
-  sprintf_P(log, PSTR("%s%s"), "MQTT : Payload: ", c_payload);
+
+  log=F("MQTT : Payload: ");
+  log+=c_payload;
   addLog(LOG_LEVEL_DEBUG, log);
+
+  // sprintf_P(log, PSTR("%s%s"), "MQTT : Topic: ", c_topic);
+  // addLog(LOG_LEVEL_DEBUG, log);
+  // sprintf_P(log, PSTR("%s%s"), "MQTT : Payload: ", c_payload);
+  // addLog(LOG_LEVEL_DEBUG, log);
 
   struct EventStruct TempEvent;
   TempEvent.String1 = c_topic;
@@ -76,35 +118,43 @@ void callback(char* c_topic, byte* b_payload, unsigned int length) {
 \*********************************************************************************************/
 void MQTTConnect()
 {
+  if (WiFi.status() != WL_CONNECTED) return;
   ControllerSettingsStruct ControllerSettings;
   LoadControllerSettings(0, (byte*)&ControllerSettings, sizeof(ControllerSettings)); // todo index is now fixed to 0
 
-  IPAddress MQTTBrokerIP(ControllerSettings.IP);
-  MQTTclient.setServer(MQTTBrokerIP, ControllerSettings.Port);
+  if (ControllerSettings.UseDNS) {
+    MQTTclient.setServer(ControllerSettings.getHost().c_str(), ControllerSettings.Port);
+  } else {
+    MQTTclient.setServer(ControllerSettings.getIP(), ControllerSettings.Port);
+  }
   MQTTclient.setCallback(callback);
 
   // MQTT needs a unique clientname to subscribe to broker
-  String clientid = "ESPClient";
-  clientid += Settings.Unit;
+  String clientid = Settings.Name; // clientid = %sysname%
+  if (Settings.Unit != 0) // set unit number to zero if don't want to add to clientid
+  {
+    clientid += Settings.Unit;
+  }
   String subscribeTo = "";
-
   String LWTTopic = ControllerSettings.Subscribe;
   LWTTopic.replace(F("/#"), F("/status"));
   LWTTopic.replace(F("%sysname%"), Settings.Name);
-  
+
   for (byte x = 1; x < 3; x++)
   {
     String log = "";
     boolean MQTTresult = false;
 
     if ((SecuritySettings.ControllerUser[0] != 0) && (SecuritySettings.ControllerPassword[0] != 0))
-      MQTTresult = MQTTclient.connect(clientid.c_str(), SecuritySettings.ControllerUser[0], SecuritySettings.ControllerPassword[0], LWTTopic.c_str(), 0, 0, "Connection Lost");
+      MQTTresult = MQTTclient.connect(clientid.c_str(), SecuritySettings.ControllerUser[0], SecuritySettings.ControllerPassword[0], LWTTopic.c_str(), 0, 1, "Connection Lost");
     else
-      MQTTresult = MQTTclient.connect(clientid.c_str(), LWTTopic.c_str(), 0, 0, "Connection Lost");
+      MQTTresult = MQTTclient.connect(clientid.c_str(), LWTTopic.c_str(), 0, 1, "Connection Lost");
 
     if (MQTTresult)
     {
-      log = F("MQTT : Connected to broker");
+      log = F("MQTT : ClientID ");
+      log += clientid;
+      log += " connected to broker";
       addLog(LOG_LEVEL_INFO, log);
       subscribeTo = ControllerSettings.Subscribe;
       subscribeTo.replace(F("%sysname%"), Settings.Name);
@@ -112,11 +162,17 @@ void MQTTConnect()
       log = F("Subscribed to: ");
       log += subscribeTo;
       addLog(LOG_LEVEL_INFO, log);
+
+      MQTTclient.publish(LWTTopic.c_str(), "Connected", 1);
+
+      statusLED(true);
       break; // end loop if succesfull
     }
     else
     {
-      log = F("MQTT : Failed to connected to broker");
+      log = F("MQTT : ClientID ");
+      log += clientid;
+      log +=" failed to connected to broker";
       addLog(LOG_LEVEL_ERROR, log);
     }
 
@@ -132,17 +188,20 @@ void MQTTCheck()
 {
   byte ProtocolIndex = getProtocolIndex(Settings.Protocol[0]);
   if (Protocol[ProtocolIndex].usesMQTT)
-    if (!MQTTclient.connected())
+  {
+    if (!MQTTclient.connected() || WiFi.status() != WL_CONNECTED)
     {
-      String log = F("MQTT : Connection lost");
-      addLog(LOG_LEVEL_ERROR, log);
+      addLog(LOG_LEVEL_ERROR, F("MQTT : Connection lost"));
       connectionFailures += 2;
       MQTTclient.disconnect();
-      delay(1000);
-      MQTTConnect();
+      if (WiFi.status() == WL_CONNECTED) {
+        delay(1000);
+        MQTTConnect();
+      }
     }
     else if (connectionFailures)
       connectionFailures--;
+  }
 }
 
 
@@ -181,6 +240,3 @@ void MQTTStatus(String& status)
   pubname.replace(F("%sysname%"), Settings.Name);
   MQTTclient.publish(pubname.c_str(), status.c_str(),Settings.MQTTRetainFlag);
 }
-
-
-

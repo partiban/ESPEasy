@@ -2,13 +2,16 @@
 //#################################### Plugin 016: Input IR #############################################
 //#######################################################################################################
 
+
+#ifdef PLUGIN_BUILD_NORMAL
+
 #include <IRremoteESP8266.h>
 IRrecv *irReceiver;
 decode_results results;
 
 #define PLUGIN_016
 #define PLUGIN_ID_016         16
-#define PLUGIN_NAME_016       "Infrared Receive - TSOP4838"
+#define PLUGIN_NAME_016       "Communication - TSOP4838"
 #define PLUGIN_VALUENAME1_016 "IR"
 
 boolean Plugin_016(byte function, struct EventStruct *event, String& string)
@@ -89,3 +92,4 @@ boolean Plugin_016(byte function, struct EventStruct *event, String& string)
   return success;
 }
 
+#endif

@@ -2,20 +2,27 @@
 // Syslog
 // UDP system messaging
 // SSDP
+  #if LWIP_VERSION_MAJOR == 2
+   #define IP2STR(addr) (uint8_t)((uint32_t)addr &  0xFF), (uint8_t)(((uint32_t)addr >> 8) &  0xFF), (uint8_t)(((uint32_t)addr >> 16) &  0xFF), (uint8_t)(((uint32_t)addr >> 24) &  0xFF)
+  #endif  
+ 
+ 
 
 /*********************************************************************************************\
    Syslog client
   \*********************************************************************************************/
 void syslog(const char *message)
 {
-  if (Settings.Syslog_IP[0] != 0)
+  if (Settings.Syslog_IP[0] != 0 && WiFi.status() == WL_CONNECTED)
   {
     IPAddress broadcastIP(Settings.Syslog_IP[0], Settings.Syslog_IP[1], Settings.Syslog_IP[2], Settings.Syslog_IP[3]);
     portUDP.beginPacket(broadcastIP, 514);
     char str[256];
     str[0] = 0;
     snprintf_P(str, sizeof(str), PSTR("<7>ESP Unit: %u : %s"), Settings.Unit, message);
-    portUDP.write(str);
+    #if defined(ESP8266)
+      portUDP.write(str);
+    #endif
     portUDP.endPacket();
   }
 }
@@ -48,13 +55,21 @@ struct dataStruct
   float Values[VARS_PER_TASK];
 };
 
+//TODO: add sysinfoStruct
+
 /*********************************************************************************************\
-   Check UDP messages
+   Check UDP messages (ESPEasy propiertary protocol)
   \*********************************************************************************************/
+boolean runningUPDCheck = false;
 void checkUDP()
 {
   if (Settings.UDPPort == 0)
     return;
+
+  if (runningUPDCheck)
+    return;
+
+  runningUPDCheck = true;
 
   // UDP events
   int packetSize = portUDP.parsePacket();
@@ -66,6 +81,7 @@ void checkUDP()
     if (portUDP.remotePort() == 123)
     {
       // unexpected NTP reply, drop for now...
+      runningUPDCheck = false;
       return;
     }
     char packetBuffer[128];
@@ -98,6 +114,8 @@ void checkUDP()
       // binary data!
       switch (packetBuffer[1])
       {
+
+        //TODO: use a nice struct for it
         case 1: // sysinfo message
           {
             byte mac[6];
@@ -125,9 +143,9 @@ void checkUDP()
             }
 
             char macaddress[20];
-            sprintf_P(macaddress, PSTR("%02x:%02x:%02x:%02x:%02x:%02x"), mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-            char ipaddress[16];
-            sprintf_P(ipaddress, PSTR("%u.%u.%u.%u"), ip[0], ip[1], ip[2], ip[3]);
+            formatMAC(mac, macaddress);
+            char ipaddress[20];
+            formatIP(ip, ipaddress);
             char log[80];
             sprintf_P(log, PSTR("UDP  : %s,%s,%u"), macaddress, ipaddress, unit);
             addLog(LOG_LEVEL_DEBUG_MORE, log);
@@ -203,6 +221,10 @@ void checkUDP()
       }
     }
   }
+  #if defined(ESP32) // testing
+    portUDP.flush();
+  #endif
+  runningUPDCheck = false;
 }
 
 
@@ -211,6 +233,9 @@ void checkUDP()
   \*********************************************************************************************/
 void SendUDPTaskInfo(byte destUnit, byte sourceTaskIndex, byte destTaskIndex)
 {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
   struct infoStruct infoReply;
   infoReply.sourcelUnit = Settings.Unit;
   infoReply.sourceTaskIndex = sourceTaskIndex;
@@ -243,6 +268,9 @@ void SendUDPTaskInfo(byte destUnit, byte sourceTaskIndex, byte destTaskIndex)
   \*********************************************************************************************/
 void SendUDPTaskData(byte destUnit, byte sourceTaskIndex, byte destTaskIndex)
 {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
   struct dataStruct dataReply;
   dataReply.sourcelUnit = Settings.Unit;
   dataReply.sourceTaskIndex = sourceTaskIndex;
@@ -272,6 +300,9 @@ void SendUDPTaskData(byte destUnit, byte sourceTaskIndex, byte destTaskIndex)
   \*********************************************************************************************/
 void SendUDPCommand(byte destUnit, char* data, byte dataLength)
 {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
   byte firstUnit = 1;
   byte lastUnit = UNIT_MAX - 1;
   if (destUnit != 0)
@@ -289,10 +320,13 @@ void SendUDPCommand(byte destUnit, char* data, byte dataLength)
 
 
 /*********************************************************************************************\
-   Send UDP message
+   Send UDP message (unit 255=broadcast)
   \*********************************************************************************************/
 void sendUDP(byte unit, byte* data, byte size)
 {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
   if (unit != 255)
     if (Nodes[unit].ip[0] == 0)
       return;
@@ -330,12 +364,16 @@ void refreshNodeList()
   }
 }
 
+/*********************************************************************************************\
+   Broadcast system info to other nodes. (to update node lists)
+  \*********************************************************************************************/
 void sendSysInfoUDP(byte repeats)
 {
   char log[80];
-  if (Settings.UDPPort == 0)
+  if (Settings.UDPPort == 0 || WiFi.status() != WL_CONNECTED)
     return;
 
+  // TODO: make a nice struct of it and clean up
   // 1 byte 'binary token 255'
   // 1 byte id '1'
   // 6 byte mac
@@ -387,16 +425,17 @@ void sendSysInfoUDP(byte repeats)
   }
 }
 
-
+#if defined(ESP8266)
 /********************************************************************************************\
   Respond to HTTP XML requests for SSDP information
   \*********************************************************************************************/
-void SSDP_schema(WiFiClient client) {
+void SSDP_schema(WiFiClient &client) {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
 
-  IPAddress ip = WiFi.localIP();
-  char str[20];
-  sprintf_P(str, PSTR("%u.%u.%u.%u"), ip[0], ip[1], ip[2], ip[3]);
-  uint32_t chipId = ESP.getChipId();
+  const IPAddress ip = WiFi.localIP();
+  const uint32_t chipId = ESP.getChipId();
   char uuid[64];
   sprintf_P(uuid, PSTR("38323636-4558-4dda-9188-cda0e6%02x%02x%02x"),
             (uint16_t) ((chipId >> 16) & 0xff),
@@ -416,7 +455,7 @@ void SSDP_schema(WiFiClient client) {
                          "<minor>0</minor>"
                          "</specVersion>"
                          "<URLBase>http://");
-  ssdp_schema += str;
+  ssdp_schema += formatIP(ip);
   ssdp_schema += F(":80/</URLBase>"
                    "<device>"
                    "<deviceType>urn:schemas-upnp-org:device:BinaryLight:1</deviceType>"
@@ -567,6 +606,7 @@ void SSDP_send(byte method) {
     remotePort = SSDP_PORT;
   }
   _server->send(&remoteAddr, remotePort);
+  statusLED(true);
 }
 
 
@@ -690,10 +730,10 @@ void SSDP_update() {
     }
   }
 
-  if (_pending && (millis() - _process_time) > _delay) {
+  if (_pending && timeOutReached(_process_time + _delay)) {
     _pending = false; _delay = 0;
     SSDP_send(NONE);
-  } else if (_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)) {
+  } else if (_notify_time == 0 || timeOutReached(_notify_time + (SSDP_INTERVAL * 1000L))) {
     _notify_time = millis();
     SSDP_send(NOTIFY);
   }
@@ -704,3 +744,4 @@ void SSDP_update() {
   }
 
 }
+#endif
